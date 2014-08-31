@@ -1,0 +1,107 @@
+#!/bin/sh
+
+#  DeviceInfo.sh
+#  
+#
+#  Created by Dayt0n on 8/30/14.
+#
+
+clear
+echo "Killing Stuff that might get in the way..."
+killall iTunesHelper 2&>1 /dev/null
+killall iTunes 2&>1 /dev/null
+killall Xcode 2&>1 /dev/null
+sleep 3
+clear
+cd
+cd /Applications/Xcode6-Beta6.app/Contents/Developer/Platforms/iPhoneOS.platform/DeviceSupport
+read -p "What are the first 2 digits of your firmware? [4.2 for 4.2.1, 7.1 for 7.1.2, etc]: " firmnumber
+cd $firmnumber
+ideviceimagemounter DeveloperDiskImage.dmg DeveloperDiskImage.dmg.signature
+read -p "Was the mount a success? [y or n]: " ifsuccess
+if [[ $ifsuccess = y ]]; then
+    echo "Good."
+    sleep 1
+    clear
+else
+    echo "Rebooting and Unmounting Entire Filesystem..."
+    sleep 3
+    idevicediagnostics restart
+    sleep 78
+    ideviceimagemounter DeveloperDiskImage.dmg DeveloperDiskImage.dmg.signature
+    sleep 1
+    clear
+fi
+#done
+cd
+echo "Hacking and Collecting Infos..."
+cd DeviceInfo
+mkdir `idevice_id -l` > /dev/null
+cd `idevice_id -l`
+mkfile -nv 0 `idevicename` 2&>1 /dev/null
+sleep 0.5
+rm 1
+rm 2
+clear
+ideviceinfo > Info.txt
+idevicescreenshot > /dev/null
+mkdir CrashReports
+idevicecrashreport -k CrashReports
+sleep 1
+mkdir Backup
+idevicebackup2 backup -d --full Backup
+sleep 2
+cd
+sleep 1
+idevicebackup2 -u `idevice_id -l` unback ~/DeviceInfo/`idevice_id -l`/Backup
+echo "Backed-up and Decrypted filesystem"
+sleep 3
+clear
+echo "Finished Gathering Information"
+sleep 2
+clear
+read -p "For Funzies, would you like to hack into the iBoot of the device? [y or n]: " mayiboot
+if [[ $mayiboot = n ]]; then
+    clear
+    echo "Ok. Thank you for using Dayt0n's SWEET iDevice Hacker!"
+    sleep 3
+    exit
+else
+    echo "Cracking plist blocks..."
+    sleep 2
+fi
+#done cracking
+ideviceenterrecovery `idevice_id -l` > /dev/null
+echo "Entering Recovery..."
+sleep 15
+echo "When you are ready to exit iBoot, just use the Control+c command."
+sleep 2
+clear
+iRecovery -s
+clear
+read -p "Would you like to get out of a Recovery loop? [y or n]: " wantoutrecovery
+if [[ $wantoutrecovery = n ]]; then
+    clear
+    echo "Ok. Well, that's really all I have... Thanks!"
+    sleep 3
+    exit
+else
+    echo "Exiting Recovery..."
+    sleep 1
+fi
+echo "Writing Boot Script..."
+iRecovery -c "setenv auto-boot true" > /dev/null
+sleep 1
+echo "Flashing New BootChain..."
+iRecovery -c "saveenv" > /dev/null
+sleep 1
+echo "Rebooting..."
+iRecovery -c "reboot" > /dev/null
+sleep 1
+echo "Done!"
+sleep 3
+clear
+echo "Thats really all I have... Thanks for using my tool! -Dayt0n"
+sleep 5
+clear
+exit
