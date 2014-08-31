@@ -35,6 +35,7 @@ fi
 #done
 cd
 echo "Hacking and Collecting Infos..."
+mkdir DeviceInfo 2&>1 /dev/null
 cd DeviceInfo
 mkdir `idevice_id -l` > /dev/null
 cd `idevice_id -l`
