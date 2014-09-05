@@ -44,10 +44,11 @@ cd
 echo "Hacking and Collecting Infos..."
 mkdir DeviceInfo 2&>1 /dev/null
 cd DeviceInfo
-mkdir `idevice_id -l` > /dev/null
-cd `idevice_id -l`
-mkfile -nv 0 `idevicename` 2&>1 /dev/null
+mkdir "`idevicename`" > /dev/null
+cd "`idevicename`"
+mkfile -nv 0 UDID 2&>1 /dev/null
 sleep 0.5
+echo "`idevice_id -l`" > UDID
 rm 1
 rm 2
 clear
@@ -61,10 +62,15 @@ idevicebackup2 backup -d --full Backup
 sleep 2
 cd
 sleep 1
-idevicebackup2 -u `idevice_id -l` unback ~/DeviceInfo/`idevice_id -l`/Backup
+idevicebackup2 -u `idevice_id -l` unback ~/DeviceInfo/"`idevicename`"/Backup
 echo "Backed-up and Decrypted filesystem"
 sleep 3
 clear
+cd ~/DeviceInfo/"`idevicename`"/Backup
+mv `idevice_id -l` "Encrypted Backup"
+mv "_unback_" "Decrypted Backup"
+cd "Decrypted Backup"
+mv `idevice_id -l` "Decrypted"
 echo "Finished Gathering Information"
 sleep 2
 clear
